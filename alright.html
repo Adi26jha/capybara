@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Capybara-Themed Animation</title>
+    <style>
+        /* Basic page styling */
+        body {
+    margin: 0;
+    padding: 0;
+    background-image: url('strawberry-light-background_23-2148145104.jpg');
+    background-size: cover; /* Ensures the background image covers the entire viewport */
+    background-position: center center; /* Centers the background image */
+    background-repeat: no-repeat; /* Prevents repeating the background image */
+    background-attachment: fixed; /* Keeps the background fixed when scrolling */
+    overflow: hidden; /* Prevents any content from overflowing */
+    width: 100vw; /* Full width of the viewport */
+    height: 100vh; /* Full height of the viewport */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+}
+
+
+
+
+
+        /* Text styling */
+        .text-above, .text-below {
+            font-family: 'sans-serif';
+            font-weight: bold;
+            font-size: 32px; /* Increased font size */
+            color: brown; /* Changed text color to brown */
+            text-align: center;
+        }
+
+        .text-above {
+            margin-bottom: 30px; /* Space between the text and moving image */
+        }
+
+        .text-below {
+            margin-top: 30px; /* Space between the moving image and text */
+        }
+
+        /* Image styling and animation */
+        .moving-image-container {
+            position: relative;
+            width: 100%; /* Full width of the screen */
+            height: 100px; /* Adjust height to fit the image and avoid overlap with text */
+            overflow: hidden; /* Ensure the image stays within bounds */
+        }
+
+        .moving-image {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100px;
+            height: 100px;
+            animation: move-left-right 5s infinite linear;
+            transition: transform 0.5s ease; /* Smooth transition for spinning */
+        }
+
+        /* Animation keyframes for left to right movement */
+        @keyframes move-left-right {
+            0% {
+                left: 0; /* Start from left edge */
+            }
+            100% {
+                left: calc(100% - 100px); /* Move to the right edge without exceeding */
+            }
+        }
+
+        /* Falling image styling */
+        .falling-image {
+            position: absolute;
+            width: 50px;
+            height: 50px;
+            opacity: 0;
+            pointer-events: none; /* Prevent any interaction with the falling image */
+            transition: top 0.5s ease; /* Smooth falling transition */
+        }
+
+        /* Falling animation */
+        @keyframes fall {
+            0% {
+                top: -100px; /* Start above the screen */
+                opacity: 1;
+            }
+            100% {
+                top: 100vh; /* Fall to the bottom of the viewport */
+                opacity: 0; /* Disappear when reaching the bottom */
+            }
+        }
+
+        /* Hover effect to spin the moving image */
+        .moving-image:hover {
+            transform: rotate(360deg); /* Spin the image 360 degrees */
+        }
+    </style>
+</head>
+<body>
+    <!-- Text above the moving image -->
+    <div class="text-above">
+        Like a capybara in water
+    </div>
+
+    <!-- Moving image container to ensure the image stays within bounds -->
+    <div class="moving-image-container">
+        <img src="./output-onlinegiftools.gif" alt="Strawberry" class="moving-image">
+    </div>
+
+    <!-- Text below the moving image -->
+    <div class="text-below">
+        I feel like I’m floating whenever I’m with you.
+    </div>
+
+    <script>
+        const movingImage = document.querySelector('.moving-image');
+        const body = document.querySelector('body');
+
+        let lastFallTime = 0; // Variable to control the time between falls
+        const fallInterval = 500; // Time delay (in milliseconds) between each fall
+
+        // Function to create a new falling object
+        function createFallingImage() {
+            const newImage = document.createElement('img');
+            newImage.src = 'istockphoto-579754040-612x612__1_-removebg-preview.png'; // Using your provided image URL
+            newImage.classList.add('falling-image');
+            newImage.style.left = (movingImage.getBoundingClientRect().left + movingImage.offsetWidth / 2 - 25) + 'px'; // Align the falling image with the moving image
+            newImage.style.top = '0px'; // Start from the top of the screen
+            body.appendChild(newImage);
+
+            // Start falling animation
+            newImage.style.opacity = '1';
+            newImage.style.animation = 'fall 3s linear forwards';
+
+            // Remove the image after the fall animation completes
+            setTimeout(() => {
+                newImage.remove();
+            }, 3000);
+        }
+
+        // Throttling the fall creation to limit the number of falling images
+        function handleMouseMove() {
+            const currentTime = new Date().getTime();
+            if (currentTime - lastFallTime > fallInterval) {
+                createFallingImage(); // Create a falling image aligned with the moving image
+                lastFallTime = currentTime;
+            }
+        }
+
+        // Add event listener to the moving image
+        movingImage.addEventListener('mouseenter', () => {
+            createFallingImage(); // Drop the first image when the cursor meets the moving image
+            document.addEventListener('mousemove', handleMouseMove); // Start tracking mouse movement
+        });
+
+        // Stop falling when the cursor leaves the moving image
+        movingImage.addEventListener('mouseleave', () => {
+            document.removeEventListener('mousemove', handleMouseMove); // Stop tracking mouse movement
+        });
+    </script>
+</body>
+</html>
